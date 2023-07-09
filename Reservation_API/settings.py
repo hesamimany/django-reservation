@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
+    'corsheaders',
 
     'account',
     'hotel',
@@ -54,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     # 'Reservation_API.middleware.PasswordAttemptMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -64,7 +66,7 @@ MIDDLEWARE = [
 
 PASSWORD_ATTEMPT_THRESHOLD = 20
 PASSWORD_ATTEMPT_RESET_TIME = 10
-
+CORS_ORIGIN_ALLOW_ALL = True
 ROOT_URLCONF = 'Reservation_API.urls'
 
 TEMPLATES = [
