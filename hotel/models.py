@@ -34,6 +34,7 @@ class Room(models.Model):
 
 
 class HotelReservation(models.Model):
+
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="hotel_reserve_user")
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="reservations_room")
     hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='reservations_hotel')

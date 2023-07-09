@@ -9,8 +9,7 @@ class HotelReservationSerializer(serializers.ModelSerializer):
 
 
 class RoomSerializer(serializers.ModelSerializer):
-    # hotel = HotelSerializer()
-    reservations = HotelReservationSerializer(many=True, read_only=True)
+    # reservations = HotelReservationSerializer(many=True, read_only=True)
 
     class Meta:
         model = Room
@@ -18,6 +17,7 @@ class RoomSerializer(serializers.ModelSerializer):
 
 
 class HotelSerializer(serializers.ModelSerializer):
+    reservation = HotelReservationSerializer(many=True, read_only=True)
     rooms = RoomSerializer(many=True, read_only=True)
 
     class Meta:

@@ -23,17 +23,50 @@ class HotelFilterView(APIView):
             hotel__city=city)
 
         index = 0
+        # print(reserved)
+        list = []
+        price = []
+        for hotel in Hotel.objects.all():
+            if hotel.city == city:
+                res = HotelReservation.objects.all().values().filter(hotel_id=hotel.pk).first()
+                price.append(Room.objects.all().values().get(pk=res.get("room_id")).get("price"))
+                for reserve in reserved:
+                    if hotel.pk == reserve.get("hotel_id"):
+                        hotel.capacity -= Room.objects.all().values().get(pk=reserve.get("room_id")).get("num_beds")
 
-        for hotel in capacity:
-            print(hotel)
-            serializer = HotelSerializer(Hotel.objects.all().get(pk=hotel['hotel']))
-            print(hotel['capacity'])
-            my_data[index] = [serializer.data, int(hotel['capacity'])]
-            index += 1
+                list.append(hotel)
+
+        print(list)
+
+        serializer = HotelSerializer(list, many=True, partial=True)
+        # if serializer.is_valid():
+        #     print(serializer.validated_data)
+        # else:
+        #     print("hehe")
+
+        # print(capacity)
+
+        # for hotel in capacity:
+        #     print(hotel)
+        #     serializer = HotelSerializer(Hotel.objects.all().get(pk=hotel['hotel']))
+        #     Hotel.objects.all().get(pk=hotel['hotel'])
+        #     room = HotelReservation.objects.all().filter(hotel=Hotel.objects.all().get(pk=hotel['hotel'])).exclude(
+        #         room__bed_type="default")
+        #     print(room.get("price"))
+        #     print(hotel['capacity'])
+        #     my_data[index] = [serializer.data, int(hotel['capacity'])]
+        #     index += 1
 
         # capacity =
+        dic = serializer.data
 
-        return Response(my_data, status=200)
+        index = 0
+        for _ in dic:
+            dic[index]["price"] = price[index]
+            index += 1
+            # print(dic[index])
+
+        return Response(dic, status=200)
 
 
 class HotelAPIView(APIView):
@@ -74,7 +107,7 @@ class HotelReservationAPIView(APIView):
         else:
             # Logic for retrieving all reservations
             reservations = HotelReservation.objects.all()
-            serializer = HotelReservationSerializer(reservations, many=True)
+            serializer = HotelSerializer(reservations, many=True)
             return Response(serializer.data)
 
     def post(self, request):
