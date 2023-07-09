@@ -38,9 +38,8 @@ class UserAPIView(APIView):
         return Response(serializer.errors, status=400)
 
     def put(self, request, *args, **kwargs):
-        pk = self.kwargs.get('pk')
-        user = self.get_object(pk)
-        serializer = UserSerializer(user, data=request.data)
+        user = request.user
+        serializer = UserSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
