@@ -55,7 +55,7 @@ class TicketAPIView(APIView):
             return Response({'error': 'The plane is full.'}, status=400)
 
         reservation = Ticket(
-            user=request.user,
+            user=request.my_user,
             plane=plane,
             total=total
         )

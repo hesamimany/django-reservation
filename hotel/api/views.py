@@ -68,7 +68,7 @@ class HotelReservationAPIView(APIView):
         hotel = room.hotel
 
         reservation = HotelReservation(
-            user=request.user,
+            user=request.my_user,
             room=room,
             hotel=hotel,
             check_in=check_in,

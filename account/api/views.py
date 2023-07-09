@@ -1,12 +1,13 @@
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user_model
 from django.http import Http404
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.contrib.auth.hashers import make_password
 
-from account.api.serializer import UserSerializer
+from account.api.serializer import UserSerializer, UserCreateSerializer
 from account.models import CustomUser
 
 
@@ -70,13 +71,16 @@ class UserAPIView(APIView):
 
 
 class LoginAPIView(APIView):
+
     def post(self, request):
         request.session.pop(f'password_attempt:{request.META.get("REMOTE_ADDR")}', None)
 
-        username = request.data.get('username')
+        phone_number = request.data.get('phone_number')
         password = request.data.get('password')
-
-        user = authenticate(request=request, username=username, password=password)
+        # print(password, end="\n")
+        # print(get_user_model().objects.all().get(phone_number=phone_number).password)
+        user = authenticate(request=request, phone_number=phone_number, password=password)
+        print(user, end="\n\n\n\n\n")
         if user:
             token, _ = Token.objects.get_or_create(user=user)
             return Response({'token': token.key})
@@ -88,6 +92,22 @@ class LogoutAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        user = request.user
+        user = request.my_user
         Token.objects.filter(user=user).delete()
         return Response({'success': 'Logged out successfully'})
+
+
+class SignupAPIView(APIView):
+    def post(self, request):
+
+        # if phone_number not in CustomUser.objects.all().filter(phone_number=phone_number):
+        #     return Response({'error': 'User already exists'}, status=401)
+        # else:
+        serializer = UserCreateSerializer(data=request.data)
+        if serializer.is_valid():
+
+            user = serializer.create(serializer.validated_data)
+            print(user, end="\n\n\n\n")
+            return Response(serializer.data, status.HTTP_201_CREATED)
+        else:
+            return Response({'message': "else of post create"}, status=401)

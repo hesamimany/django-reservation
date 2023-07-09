@@ -53,7 +53,7 @@ class TicketAPIView(APIView):
             return Response({'error': 'The train is full.'}, status=400)
 
         reservation = Ticket(
-            user=request.user,
+            user=request.my_user,
             train=train,
             total=total
         )
