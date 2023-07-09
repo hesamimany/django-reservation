@@ -29,6 +29,7 @@ class HotelFilterView(APIView):
             serializer = HotelSerializer(Hotel.objects.all().get(pk=hotel['hotel']))
             print(hotel['capacity'])
             my_data[index] = [serializer.data, int(hotel['capacity'])]
+            index += 1
 
         # capacity =
 
