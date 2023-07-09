@@ -28,7 +28,7 @@ class HotelFilterView(APIView):
             print(hotel)
             serializer = HotelSerializer(Hotel.objects.all().get(pk=hotel['hotel']))
             print(hotel['capacity'])
-            my_data[index] = [serializer.data, hotel['capacity']]
+            my_data[index] = [serializer.data, int(hotel['capacity'])]
 
         # capacity =
 
