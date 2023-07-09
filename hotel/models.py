@@ -34,11 +34,11 @@ class Room(models.Model):
 
 
 class HotelReservation(models.Model):
-    my_user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
-    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="reservations")
-    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="hotel_reserve_user")
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="reservations_room")
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='reservations_hotel')
     check_in = models.DateField(default=timezone.now)
     check_out = models.DateField()
 
     def __str__(self):
-        return f'{self.my_user} got {self.room}'
+        return f'{self.user} got {self.room}'

@@ -1,3 +1,4 @@
+from django.db.models import F, Sum, Q
 from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
@@ -8,11 +9,30 @@ from hotel.models import Hotel, Room, HotelReservation
 from .serializer import HotelReservationSerializer, HotelSerializer
 
 
-# class AddHotelAPIView(APIView):
-#     def get(self, request):
-#         hotels = Hotel.objects.all()
-#         serializer = RoomSerializer(hotels, many=True)
-#         return Response(serializer.data)
+class HotelFilterView(APIView):
+    def post(self, request):
+        city = request.data.get('city')
+        entry_date = request.data.get('entry')
+        exit_date = request.data.get('exit')
+        total = request.data.get('total')
+        my_data = {}
+        reserved = HotelReservation.objects.all().filter(
+            Q(check_in__lte=entry_date, check_out__gte=entry_date) | Q(check_in__lte=exit_date,
+                                                                       check_out__gte=exit_date)).values()
+        capacity = HotelReservation.objects.values('hotel').annotate(capacity=Sum(F('room__num_beds'))).filter(
+            hotel__city=city)
+
+        index = 0
+
+        for hotel in capacity:
+            print(hotel)
+            serializer = HotelSerializer(Hotel.objects.all().get(pk=hotel['hotel']))
+            print(hotel['capacity'])
+            my_data[index] = [serializer.data, hotel['capacity']]
+
+        # capacity =
+
+        return Response(my_data, status=200)
 
 
 class HotelAPIView(APIView):
@@ -65,7 +85,8 @@ class HotelReservationAPIView(APIView):
         if not room.is_available:
             return Response({'error': 'The room is not available.'}, status=400)
 
-        hotel = room.hotel
+        hotel = room.reservations_room.hotel
+        # hotel = Hotel.objects.all().first()
 
         reservation = HotelReservation(
             user=request.my_user,
@@ -77,8 +98,8 @@ class HotelReservationAPIView(APIView):
         reservation.save()
 
         numBeds = room.num_beds
-        room.hotel.capacity -= numBeds
-        room.hotel.save()
+        # room.hotel.capacity -= numBeds
+        # room.hotel.save()
 
         room.is_available = False
         room.save()
